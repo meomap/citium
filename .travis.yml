@@ -1,0 +1,18 @@
+language: go
+sudo: false
+
+go:
+  - "1.11.x"
+
+install:
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/lint/golint
+
+script:
+  - gofmt -l .
+  - golint ./...
+  - go tool vet -shadow .
+  - env GO111MODULE=on go test -v -covermode=count -coverprofile=coverage.out ./...
+  - env GO111MODULE=on go mod vendor
+  - goveralls -coverprofile=coverage.out -service=travis-ci
