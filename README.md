@@ -98,9 +98,9 @@ sam local invoke TriggerAPIFunction  --no-event --env-vars env.json --debug
 
 ## Usage
 
-### Build CLI tool
+### Install CLI tool
 
-Compile cli tool to schedule requests:
+Download cli tool from [release](https://github.com/meomap/citium/releases) or compile from source:
 
 ```shell
 make build-tools
