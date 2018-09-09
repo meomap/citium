@@ -145,7 +145,7 @@ To release the execution lock:
 
 ## Extra options
 
-Optional extra values for API request authorization, base url are configured via environment variables:
+Optional extra values for API request authorization, base url, etc are configured via environment variables:
 
 ```yam
 ...
