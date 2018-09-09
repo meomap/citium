@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -17,16 +18,23 @@ import (
 )
 
 type mockHTTPClient struct {
-	counter uint32
+	counter    uint32
+	once       *sync.Once
+	requestErr error
 }
 
 func (mc *mockHTTPClient) DoRequest(ctx context.Context, method, urlStr string, headers map[string]string, body string) (*schema.Response, error) {
 	atomic.AddUint32(&mc.counter, 1)
-	return &schema.Response{}, nil
+	var err error
+	mc.once.Do(func() {
+		err = mc.requestErr
+	})
+	return &schema.Response{}, err
 }
 
 func (mc *mockHTTPClient) clear() {
 	mc.counter = 0
+	mc.once = new(sync.Once)
 }
 
 func (mc *mockHTTPClient) assertCalled(t *testing.T, expect uint32) {
@@ -74,7 +82,7 @@ func TestTriggerAPI(t *testing.T) {
 			expectExecTimes: 3,
 		},
 		{
-			caseName:    "errors raised in middle of executing requests",
+			caseName:    "errors raised in middle of executing multiple requests",
 			description: "should wait for all requests finished while collecting errors",
 			setup: func() {
 				mockConn.items = []map[string]*dynamodb.AttributeValue{
@@ -95,6 +103,36 @@ func TestTriggerAPI(t *testing.T) {
 				mockConn.updateErr = errors.New("Internal error")
 			},
 			expectExecTimes: 2,
+			err:             true,
+		},
+		{
+			caseName:    "errors due to request execution",
+			description: "should failed with error",
+			setup: func() {
+				mockConn.items = []map[string]*dynamodb.AttributeValue{
+					{
+						"ID":             {S: aws.String("test-multiple-records-4")},
+						"EffectiveAfter": {S: aws.String("2018-09-02T00:02:03Z")},
+					},
+				}
+				mockClient.requestErr = errors.New("Request error")
+			},
+			expectExecTimes: 1,
+			err:             true,
+		},
+		{
+			caseName:    "errors due to remove request execution",
+			description: "should failed with error",
+			setup: func() {
+				mockConn.items = []map[string]*dynamodb.AttributeValue{
+					{
+						"ID":             {S: aws.String("test-multiple-records-4")},
+						"EffectiveAfter": {S: aws.String("2018-09-02T00:02:03Z")},
+					},
+				}
+				mockConn.delErr = errors.New("Internal error")
+			},
+			expectExecTimes: 1,
 			err:             true,
 		},
 	} {
