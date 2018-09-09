@@ -25,6 +25,10 @@ func (mc *mockHTTPClient) DoRequest(ctx context.Context, method, urlStr string, 
 	return &schema.Response{}, nil
 }
 
+func (mc *mockHTTPClient) clear() {
+	mc.counter = 0
+}
+
 func (mc *mockHTTPClient) assertCalled(t *testing.T, expect uint32) {
 	assert.Equal(t, expect, atomic.LoadUint32(&mc.counter))
 }
@@ -96,6 +100,7 @@ func TestTriggerAPI(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("case=%s/description=%s", c.caseName, c.description), func(t *testing.T) {
 			mockConn.clear()
+			mockClient.clear()
 			c.setup()
 			err := TriggerAPI(context.Background(), conf, mockConn, mockClient)
 			if c.err == true {

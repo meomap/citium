@@ -21,6 +21,7 @@ import (
 type mockDynamoDB struct {
 	dynamodbiface.DynamoDBAPI
 	once *sync.Once
+	mu   *sync.Mutex
 	// scan function
 	lastScanQ string
 	items     []map[string]*dynamodb.AttributeValue
@@ -42,6 +43,7 @@ type mockDynamoDB struct {
 
 func (mdb *mockDynamoDB) clear() {
 	mdb.once = new(sync.Once)
+	mdb.mu = new(sync.Mutex)
 	mdb.items = []map[string]*dynamodb.AttributeValue{}
 	mdb.lastScanQ = ""
 	mdb.scanErr = nil
@@ -84,7 +86,9 @@ func (mdb *mockDynamoDB) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutIte
 }
 
 func (mdb *mockDynamoDB) DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
+	mdb.mu.Lock()
 	mdb.lastDeleteItem = input
+	mdb.mu.Unlock()
 	if mdb.delErr != nil {
 		return nil, mdb.delErr
 	}
@@ -92,7 +96,9 @@ func (mdb *mockDynamoDB) DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.
 }
 
 func (mdb *mockDynamoDB) UpdateItem(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
+	mdb.mu.Lock()
 	mdb.lastUpdateItem = input
+	mdb.mu.Unlock()
 	var err error
 	mdb.once.Do(func() {
 		err = mdb.updateErr
