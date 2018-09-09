@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -275,4 +276,12 @@ func TestExecRequest(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMustNewClient(t *testing.T) {
+	cli := Must(&HTTPClient{}, nil)
+	assert.NotNil(t, cli)
+	assert.Panics(t, func() {
+		Must(nil, errors.New("Can't create new client"))
+	})
 }
