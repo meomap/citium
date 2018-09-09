@@ -2,8 +2,6 @@
 
 Serverless function to trigger a scheduled HTTP request
 
-This is a sample template for sam-app - Below is a brief explanation of what we have generated for you:
-
 ## Requirements
 
 * AWS CLI already configured with AdministratorAccess permission [IAM Admin](https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-started_create-admin-group.html)
