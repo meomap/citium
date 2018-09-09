@@ -1,4 +1,5 @@
 # citium
+[![Go Report Card](https://goreportcard.com/badge/github.com/meomap/citium)](https://goreportcard.com/report/github.com/meomap/citium) [![Build Status](https://travis-ci.org/meomap/citium.svg?branch=master)](https://travis-ci.org/meomap/zeno) [![Coverage Status](https://coveralls.io/repos/github/meomap/citium/badge.svg?branch=master)](https://coveralls.io/github/meomap/citium?branch=master)
 
 Serverless function to trigger a scheduled HTTP request
 
