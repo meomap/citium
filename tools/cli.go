@@ -1,4 +1,4 @@
-// Package main provides cli commands to perform basic adminstrative operations on ScheduledRequest record
+// Package main provides cli commands to perform basic administrative operations on ScheduledRequest record
 //
 // To override default credentials with variables from the environment:
 // export AWS_REGION=YOUR_REGION

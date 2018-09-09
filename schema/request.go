@@ -7,7 +7,7 @@ import (
 
 // ScheduledRequest defines the parameters for a request call triggering
 type ScheduledRequest struct {
-	// Unique ID accross global region.
+	// Unique ID across global region.
 	ID string `json:"ID" valid:"required"`
 
 	// Created datetime which will be seriallized into unix nano seconds since epoch.

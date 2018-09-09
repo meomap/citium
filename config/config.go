@@ -14,7 +14,7 @@ type Configuration struct {
 	UserAgent string `json:"user_agent"`
 }
 
-// NewConfiguration returns config initalized from environment variables
+// NewConfiguration returns config initialized from environment variables
 func NewConfiguration() (*Configuration, error) {
 	table := os.Getenv("TABLE_NAME")
 	if table == "" {
