@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ScheduleTableName:
+    Type: String
+    Description: Name of the dynamodb table to be created & used by function
+    Default: citium_schedule
+
+Globals:
+  Function:
+    Runtime: go1.x
+    Timeout: 3
+    MemorySize: 128
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ScheduleTableName
+        BASE_URL: ""
+        API_TOKEN: ""
+        USER_AGENT: citium/0.0.1
+
+Resources:
+  TriggerAPIFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: citium 
+      Events:
+        PeriodicCheck:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ScheduleTableName
+
+  ScheduleTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: !Ref ScheduleTableName
+      PrimaryKey:
+        Name: ID 
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  
+  
+Outputs:
+  TriggerAPIFunction:
+    Description: "TriggerAPIFunction ARN"
+    Value: !GetAtt TriggerAPIFunction.Arn
+
+  TriggerAPIFunctionIamRole:
+    Description: "Implicit IAM Role created for TriggerAPIFunction"
+    Value: !GetAtt TriggerAPIFunctionRole.Arn
+
+  ScheduleTable:
+    Description: "ScheduleTable ARN"
+    Value: !GetAtt TriggerAPIFunction.Arn
